@@ -2,11 +2,11 @@
 
 
 export default class Cliente {
-     #id: string
+     #id: string | null;
      #nome: string
      #idade: number
 
-    constructor(nome: string, idade: number, id:string = null){
+    constructor(nome: string, idade: number, id: string | null = null){
         this.#nome = nome
         this.#idade = idade
         this.#id = id
