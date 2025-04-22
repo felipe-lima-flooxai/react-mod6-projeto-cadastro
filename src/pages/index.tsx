@@ -4,6 +4,8 @@ import Layout from "@/components/Layout";
 import Tabela from "@/components/Tabela";
 import Cliente from "@/core/Cliente";
 import Botao from "@/components/Botao";
+import Formulario from "@/components/Formulario";
+import { useState } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +18,10 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home() {
+
+  const [cliente, setCliente] = useState<Cliente>(Cliente.vazio())
+
+  const [visivel, setVisivel] = useState<"tabela" | "form">("tabela")
 
   const clientes = [
     new Cliente("Ana", 34, "1"),
@@ -31,22 +37,42 @@ export default function Home() {
   ];
 
   function clienteSelecionado(cliente: Cliente){
-    console.log(cliente.nome)
+    setCliente(cliente)
+    setVisivel("form")
   }
   
   function clienteExcluido(cliente: Cliente){
     console.log(cliente.nome)
+    setVisivel("tabela")
+  }
+
+  function salvarCliente(cliente: Cliente){
+    setVisivel("tabela")
+  }
+
+  function novoCliente(){
+    setCliente(Cliente.vazio())
+    setVisivel("form")
+
   }
 
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-purple-500 text-white">
       <Layout titulo="Cadastro Simples">
-        <div className="flex justify-end" >
-          <Botao className="mb-4" cor="blue">
-            novoCliente
-          </Botao>
-        </div>
-        <Tabela clientes={clientes} clienteSelecionado={clienteSelecionado} clienteExcluido={clienteExcluido}></Tabela>
+        {visivel === "tabela" ? 
+        (<>
+          <div className="flex justify-end" >
+            <Botao className="mb-4" cor="blue" onClick={ novoCliente }>
+              novoCliente
+            </Botao>
+          </div>
+          <Tabela clientes={clientes} clienteSelecionado={clienteSelecionado} clienteExcluido={clienteExcluido}></Tabela>
+        </>) : 
+        (
+          <Formulario cliente={cliente} cancelado={()=>setVisivel("tabela")} clienteMudou={salvarCliente}></Formulario>
+          )}
+        
+        
       </Layout>
     </div>
   );
