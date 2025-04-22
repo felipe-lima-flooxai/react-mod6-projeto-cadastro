@@ -6,7 +6,7 @@ interface LayoutProps {
 }
 
 
-export default function Layout(props){
+export default function Layout(props: any){
 
     return (
 

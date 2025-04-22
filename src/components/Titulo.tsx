@@ -1,7 +1,7 @@
 
 
 
-export default function Titulo(props){
+export default function Titulo(props: any){
 
     return (
 
