@@ -5,7 +5,9 @@ import Tabela from "@/components/Tabela";
 import Cliente from "@/core/Cliente";
 import Botao from "@/components/Botao";
 import Formulario from "@/components/Formulario";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ClienteRepositorio from "@/core/ClienteRepositorio";
+import ColecaoCliente from "../backend/db/ColecaoCliente";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,35 +21,47 @@ const geistMono = Geist_Mono({
 
 export default function Home() {
 
+  const repo: ClienteRepositorio = new ColecaoCliente()
+
+  const [clientes, setClientes] = useState<Cliente[]>([])
+
   const [cliente, setCliente] = useState<Cliente>(Cliente.vazio())
 
   const [visivel, setVisivel] = useState<"tabela" | "form">("tabela")
 
-  const clientes = [
-    new Cliente("Ana", 34, "1"),
-    new Cliente("Bruno", 28, "2"),
-    new Cliente("Carla", 45, "3"),
-    new Cliente("Daniel", 52, "4"),
-    new Cliente("Eduarda", 31, "5"),
-    new Cliente("Felipe", 40, "6"),
-    new Cliente("Gabriela", 23, "7"),
-    new Cliente("Henrique", 37, "8"),
-    new Cliente("Isabela", 29, "9"),
-    new Cliente("João", 50, "10"),
-  ];
+
+  function obterTodos(){
+    repo.obterTodos().then(clientes => {setClientes(clientes); setVisivel("form")})
+  }
+
+  useEffect(obterTodos, [])
+
+  
+
 
   function clienteSelecionado(cliente: Cliente){
     setCliente(cliente)
     setVisivel("form")
   }
   
-  function clienteExcluido(cliente: Cliente){
-    console.log(cliente.nome)
-    setVisivel("tabela")
+  function clienteExcluido(cliente: Cliente) {
+    repo.excluir(cliente)
+      .then(() => {
+        // Atualiza a lista após excluir
+        repo.obterTodos().then(setClientes);
+        setVisivel("tabela");
+      })
+      .catch(err => console.error("Erro ao excluir cliente:", err));
   }
-
-  function salvarCliente(cliente: Cliente){
-    setVisivel("tabela")
+  
+  async function salvarCliente(cliente: Cliente) {
+    await repo.salvar(cliente)
+      .then(clienteSalvo => {
+        // Atualiza a lista após salvar
+        repo.obterTodos().then(setClientes);
+        setVisivel("tabela");
+      })
+      .catch(err => console.error("Erro ao salvar cliente:", err));
   }
 
   function novoCliente(){
